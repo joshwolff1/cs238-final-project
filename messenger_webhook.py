@@ -2,7 +2,6 @@ from helpers.crossdomain import *
 from flask_restful import Resource
 from flask import request
 from helpers.my_util import Util
-from pymessenger.bot import Bot
 import requests
 import json
 
@@ -15,28 +14,36 @@ class MessengerWebhook(Resource):
     __token = "EAAwI8GYPdjcBAIK7UK41jYOYZA0zvwrdxlQuofjXQzFVCGQLI1rxwLOC758UJ1ntx4qrbppxhTfHkLl8unZCIcgZCydS7CnpL" \
               "eWhq8ZBQmCf1KZBuS0wViuuZBZClS3QGMgBVqhjZBUdaEnDqZB8jtZCfQRc2Yzy6BBiGbuZAC6ZAIuFCAZDZD"
 
-    def __send_test_message(self):
-        #
-        # bot = Bot(self.__token)
-        # response = bot.send_text_message("3387111534710086", "hello, world!")
-        # print(response)
+    def __send_message(self, recipient_id, message, responses):
+
+        def construct_quick_replies():
+            quick_replies = list()
+            for resp in responses:
+                quick_replies.append({
+                    "content_type": "text",
+                    "title": resp,
+                    "payload": "<POSTBACK_PAYLOAD>",
+                })
+            return quick_replies
+
         link = f"https://graph.facebook.com/v8.0/me/messages?access_token={self.__token}"
         body = {
-            "messaging_type": "Text",
+            "messaging_type": "RESPONSE",
             "recipient": {
-                "id": "3387111534710086"
+                "id": recipient_id
             },
             "message": {
-                "text": "hello, world!"
+                "text": message,
+                "quick_replies": construct_quick_replies()
             }
         }
         r = requests.request(
             "POST",
             url=link,
-            data=json.dumps(body)
+            data=json.dumps(body),
+            headers={'content-type': 'application/json'}
         )
         json_content = json.loads(r.content)
-        print("-----")
         print(json_content)
 
     # noinspection PyMethodMayBeStatic
@@ -60,19 +67,12 @@ class MessengerWebhook(Resource):
         print("\n\n")
         print(data_received)
 
-        # TODO:- Send the message in response.
-
-        """
-        message:{
-            text: 'I have an issue with an order'
-            mid: '<MID>'
-            reply_to: {
-                mid: '<MID_OF_MESSAGE_BEING_REPLIED_TO>',
-            }
-        }
-        """
-
-        self.__send_test_message()
+        # Send a message in response.
+        self.__send_message(
+            recipient_id=data_received['entry'][0]['messaging'][0]['sender']['id'],
+            message="Hello!",
+            responses=["Lilly", "Michelle"]
+        )
 
         return Util.make_json_response(None, {
             "message": {
