@@ -22,6 +22,7 @@ class Util:
         else:
             jsonified_dict = jsonify(dict_to_send)
         jsonified_dict.status_code = status_code
+        print("JSON!")
         print(jsonified_dict)
         return jsonified_dict
 
