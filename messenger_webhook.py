@@ -2,6 +2,7 @@ from helpers.crossdomain import *
 from flask_restful import Resource
 from flask import request
 from helpers.my_util import Util
+from helpers.DeterministicTree import DETERMINISTIC_TREE
 import requests
 import json
 
@@ -11,8 +12,8 @@ class MessengerWebhook(Resource):
     method_decorators = [crossdomain(origin="*")]
 
     # noinspection SpellCheckingInspection
-    __token = "EAAwI8GYPdjcBAIK7UK41jYOYZA0zvwrdxlQuofjXQzFVCGQLI1rxwLOC758UJ1ntx4qrbppxhTfHkLl8unZCIcgZCydS7CnpL" \
-              "eWhq8ZBQmCf1KZBuS0wViuuZBZClS3QGMgBVqhjZBUdaEnDqZB8jtZCfQRc2Yzy6BBiGbuZAC6ZAIuFCAZDZD"
+    __token = "EAAwI8GYPdjcBAN4dgwpoJl1XGhfRxpmkxnv9OwYtGYmoBa3s9nVV0aerEanKG8OhZAyFiVPm0S4PXgDXO9fDdV8EOyZAZBeXBWuNh" \
+              "UL4CVNEvqZCJ3vF8VuU0BDukcizZC4mBIoEZBtoqdpCWshTrYVmVMmwZBX7T1f73CNyulBhwZDZD"
 
     def __send_message(self, recipient_id, message, responses):
 
@@ -37,6 +38,8 @@ class MessengerWebhook(Resource):
                 "quick_replies": construct_quick_replies()
             }
         }
+        if len(construct_quick_replies()) == 0:
+            body["message"].pop("quick_replies")
         r = requests.request(
             "POST",
             url=link,
@@ -67,19 +70,43 @@ class MessengerWebhook(Resource):
         print("\n\n")
         print(data_received)
 
+        message = data_received['entry'][0]['messaging'][0]['message']['text']
+        print("MESSAGE!", message)
+
+        node = None
+        for _, item in DETERMINISTIC_TREE.items():
+            if item is None:
+                node = 0
+                continue
+            should_break = False
+            for key, reply in item.replies.items():
+                if reply == message:
+                    node = key
+                    should_break = True
+                    break
+            if should_break:
+                break
+
+        try:
+            if node is None or DETERMINISTIC_TREE[node] is None:
+                node = 0
+        except KeyError:
+            node = 0
+
         # Send a message in response.
         self.__send_message(
             recipient_id=data_received['entry'][0]['messaging'][0]['sender']['id'],
-            message="Hello!",
-            responses=["Lilly", "Michelle"]
+            message=DETERMINISTIC_TREE[node].question,
+            responses=DETERMINISTIC_TREE[node].replies.values()
         )
+
+        print("Make response....")
 
         return Util.make_json_response(None, {
             "message": {
-                "text": "Hello!"
+                "text": "Need to send something back!"
             }
         }, 200)
-        # return "Success", 200
 
     # noinspection PyMethodMayBeStatic
     def patch(self):
