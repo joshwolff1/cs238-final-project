@@ -2,7 +2,7 @@ from helpers.crossdomain import *
 from flask_restful import Resource
 from flask import request
 from helpers.my_util import Util
-from helpers.DeterministicTree import DETERMINISTIC_TREE
+from helpers.deterministic_tree import DETERMINISTIC_TREE
 import requests
 import json
 

@@ -2,6 +2,58 @@ from flask import jsonify
 import jsonpickle
 import json
 from urllib.parse import unquote_plus
+from enum import Enum
+import pandas as pd
+
+
+class AlgorithmType(Enum):
+    Q_LEARNING = "Q_LEARNING"
+    VALUE_ITERATION = "VALUE_ITERATION"
+
+    def write_policy(self, info):
+        with open(f"policies/{self.value.lower()}.policy", 'w') as f:
+            states = list(info.keys())
+            states.sort()
+            for state in states:
+                f.write(f"{info[state]}\n")
+
+
+class Algorithm:
+
+    def __init__(self, algorithm):
+        self.algorithm = algorithm
+        self.q = dict()
+
+    def get_policy(self):
+        policy = dict()
+
+        for key, value in self.q.items():
+            print(key, value)
+
+        data = pd.read_csv("samples.csv")
+        states = list(set(data["s"]))
+        states.sort()
+
+        print(">>>>S>D>S>FSD>F>")
+
+        for s in states:
+            action_values = self.q.get(s, dict())
+            best_action = 0
+            best_q = -10e6
+            available_actions = list(action_values.keys())
+            available_actions.sort()
+
+            print(available_actions)
+
+            for a in available_actions:
+                if action_values.get(a, best_q) > best_q:
+                    best_action = a
+                    best_q = action_values[a]
+
+            policy[s] = best_action
+
+        print(policy)
+        self.algorithm.write_policy(policy)
 
 
 class Util:
