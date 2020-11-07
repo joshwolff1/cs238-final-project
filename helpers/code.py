@@ -36,9 +36,11 @@ def sarsa(QValues, s, a, r, sp, alpha, gamma):
 
 def chooseOptimal(QValues, filename, nStates):
     with open(filename, 'w') as f:
-        for key in range(1, nStates+1, 1):
+        for key in range(10, nStates+10, 1):
             Dict = QValues[key]
-            best_a = max(Dict.items(), key=operator.itemgetter(1))[0]
+            best_a = 1
+            if len(Dict.items()) != 0:
+                best_a = max(Dict.items(), key=operator.itemgetter(1))[0]
             f.write("{}\n".format(best_a))
         
     # ap_dict -> {s: all possible a}
@@ -65,13 +67,13 @@ def qLearning(QValues,s,a,r,sp, alpha, gamma, actions):
 
 def main():
     if len(sys.argv) != 4:
-        raise Exception("usage: python project1.py <infile>.csv <outfile>.gph")
+        raise Exception("usage: python code.py <infile>.csv <outfile>.policy")
 
     inputfilename = sys.argv[1]
     outputfilename = sys.argv[2]
     nStates = int(sys.argv[3])
-    #qLearningCompute(inputfilename, outputfilename, nStates)
-    sarsaCompute(inputfilename, outputfilename, nStates)
+    qLearningCompute(inputfilename, outputfilename, nStates)
+    #sarsaCompute(inputfilename, outputfilename, nStates)
 
 
 if __name__ == '__main__':
