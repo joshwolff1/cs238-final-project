@@ -4,7 +4,7 @@ import sys
 import operator
 
 
-def qLearningCompute(infile, outfile, nStates):
+def qLearningCompute(infile, outfile):
     df = pd.read_csv(infile)
     QValues = defaultdict(lambda: defaultdict(float))
     # initialize hyperparams
@@ -16,9 +16,9 @@ def qLearningCompute(infile, outfile, nStates):
         for _, row in df.iterrows():
             qLearning(QValues, row.s, row.a, row.r, row.sp, alpha, gamma, ap_dict[row.s])
         
-    chooseOptimal(QValues, outfile, nStates)
+    chooseOptimal(QValues, outfile)
     
-def sarsaCompute(infile, outfile, nStates):
+def sarsaCompute(infile, outfile):
     df = pd.read_csv(infile)
     QValues = defaultdict(lambda: defaultdict(float))
     gamma = 0.95
@@ -27,20 +27,24 @@ def sarsaCompute(infile, outfile, nStates):
     for i in range(10):
         for _, row in df.iterrows():
             sarsa(QValues, row.s, row.a, row.r, row.sp, alpha, gamma)
-    chooseOptimal(QValues, outfile, nStates)
+    chooseOptimal(QValues, outfile)
             
 def sarsa(QValues, s, a, r, sp, alpha, gamma):
     maxed = []                             
     QValues[s][a] = QValues[s][a] + (alpha*(r + (QValues[sp][a] - QValues[s][a]))) 
 
 
-def chooseOptimal(QValues, filename, nStates):
+def chooseOptimal(QValues, filename):
     with open(filename, 'w') as f:
-        for key in range(10, nStates+10, 1):
+        # for key in range(10, nStates+10, 1):
+        q_keys = list(QValues.keys())
+        q_keys.sort()
+        print(q_keys)
+        for key in q_keys:
             Dict = QValues[key]
-            best_a = 1
-            if len(Dict.items()) != 0:
-                best_a = max(Dict.items(), key=operator.itemgetter(1))[0]
+            # best_a = 1
+            # if len(Dict.items()) != 0:
+            best_a = max(Dict.items(), key=operator.itemgetter(1))[0]
             f.write("{}\n".format(best_a))
         
     # ap_dict -> {s: all possible a}
@@ -66,14 +70,18 @@ def qLearning(QValues,s,a,r,sp, alpha, gamma, actions):
     
 
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 3:
         raise Exception("usage: python code.py <infile>.csv <outfile>.policy")
 
+    import time
+    start = int(time.time())
     inputfilename = sys.argv[1]
     outputfilename = sys.argv[2]
-    nStates = int(sys.argv[3])
-    qLearningCompute(inputfilename, outputfilename, nStates)
-    #sarsaCompute(inputfilename, outputfilename, nStates)
+    qLearningCompute(inputfilename, outputfilename)
+    # sarsaCompute(inputfilename, outputfilename)
+
+    end = int(time.time())
+    print(end - start)
 
 
 if __name__ == '__main__':

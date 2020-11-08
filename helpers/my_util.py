@@ -7,8 +7,11 @@ import pandas as pd
 
 
 class AlgorithmType(Enum):
+
+    DETERMINISTIC = "DETERMINISTIC"
     Q_LEARNING = "Q_LEARNING"
     VALUE_ITERATION = "VALUE_ITERATION"
+    SARSA = "SARSA"
 
     def write_policy(self, info):
         with open(f"policies/{self.value.lower()}.policy", 'w') as f:
@@ -34,8 +37,6 @@ class Algorithm:
         states = list(set(data["s"]))
         states.sort()
 
-        print(">>>>S>D>S>FSD>F>")
-
         for s in states:
             action_values = self.q.get(s, dict())
             best_action = 0
@@ -52,7 +53,6 @@ class Algorithm:
 
             policy[s] = best_action
 
-        print(policy)
         self.algorithm.write_policy(policy)
 
 

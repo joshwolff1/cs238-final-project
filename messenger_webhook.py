@@ -2,9 +2,14 @@ from helpers.crossdomain import *
 from flask_restful import Resource
 from flask import request
 from helpers.my_util import Util
-from helpers.deterministic_tree import DETERMINISTIC_TREE
+from helpers.deterministic.deterministic_tree import DETERMINISTIC_TREE
 import requests
 import json
+from helpers.my_util import AlgorithmType
+from helpers.conversation import Conversation
+
+
+ALGORITHM_TO_USE = AlgorithmType.SARSA
 
 
 class MessengerWebhook(Resource):
@@ -12,8 +17,8 @@ class MessengerWebhook(Resource):
     method_decorators = [crossdomain(origin="*")]
 
     # noinspection SpellCheckingInspection
-    __token = "EAAwI8GYPdjcBAN4dgwpoJl1XGhfRxpmkxnv9OwYtGYmoBa3s9nVV0aerEanKG8OhZAyFiVPm0S4PXgDXO9fDdV8EOyZAZBeXBWuNh" \
-              "UL4CVNEvqZCJ3vF8VuU0BDukcizZC4mBIoEZBtoqdpCWshTrYVmVMmwZBX7T1f73CNyulBhwZDZD"
+    __token = "EAAwI8GYPdjcBAFLSpSFnqcBMhyy8XHZByHgqvq66RfWZBzDFLtqzZBnsgIAHmvXt3K4YYmMnOu0XbpRWPAti1TgUd6o29" \
+              "BMyVo11TTIXfN5Ip2gx9w2h0C9eRHb6Kmw3mXOGUhVM0YsEbzZBJxuV7cadas47WZAcj6NOiGRk3pgZDZD"
 
     def __send_message(self, recipient_id, message, responses):
 
@@ -70,34 +75,50 @@ class MessengerWebhook(Resource):
         print("\n\n")
         print(data_received)
 
-        message = data_received['entry'][0]['messaging'][0]['message']['text']
-        print("MESSAGE!", message)
-
-        node = None
-        for _, item in DETERMINISTIC_TREE.items():
-            if item is None:
-                node = 0
-                continue
-            should_break = False
-            for key, reply in item.replies.items():
-                if reply == message:
-                    node = key
-                    should_break = True
-                    break
-            if should_break:
-                break
-
         try:
-            if node is None or DETERMINISTIC_TREE[node] is None:
-                node = 0
+            message = data_received['entry'][0]['messaging'][0]['message']['text']
         except KeyError:
-            node = 0
+            return Util.make_json_response("Error", None, 403)
+        print("MESSAGE!", message)
+        print("a")
+
+        if ALGORITHM_TO_USE.value == AlgorithmType.DETERMINISTIC.value:
+            node = None
+            for _, item in DETERMINISTIC_TREE.items():
+                if item is None:
+                    node = 0
+                    continue
+                should_break = False
+                for key, reply in item.replies.items():
+                    if reply == message:
+                        node = key
+                        should_break = True
+                        break
+                if should_break:
+                    break
+
+            try:
+                if node is None or DETERMINISTIC_TREE[node] is None:
+                    node = 0
+            except KeyError:
+                node = 0
+
+            message = DETERMINISTIC_TREE[node].question
+            replies = DETERMINISTIC_TREE[node].replies.values()
+        else:
+            conversation_node = Conversation(ALGORITHM_TO_USE).get_next_action_from_policy(reply_str=message)
+
+            if conversation_node is None:
+                return Util.make_json_response("Ok", None, 200)
+
+            message = conversation_node.question
+            replies = conversation_node.replies
 
         # Send a message in response.
         self.__send_message(
             recipient_id=data_received['entry'][0]['messaging'][0]['sender']['id'],
-            message=DETERMINISTIC_TREE[node].question,
-            responses=DETERMINISTIC_TREE[node].replies.values()
+            message=message,
+            responses=replies
         )
 
         print("Make response....")

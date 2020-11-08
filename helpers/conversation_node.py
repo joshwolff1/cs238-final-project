@@ -5,5 +5,5 @@ class ConversationNode:
         self.question = question
         self.replies = replies
 
-        assert type(replies) == dict
+        assert type(replies) == dict or type(replies) == list
         assert type(question) == str
