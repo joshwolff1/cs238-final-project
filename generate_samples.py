@@ -67,7 +67,7 @@ class SampleGeneration:
         self.__samples.append(sample)
 
     def __write_samples_to_file(self):
-        with open('samples.csv', 'w', newline='') as csv_file:
+        with open('samples-2.csv', 'w', newline='') as csv_file:
             spam_writer = csv.writer(
                 csv_file,
                 delimiter=',',

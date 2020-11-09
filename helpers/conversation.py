@@ -55,6 +55,9 @@ class Conversation:
         except TypeError:
             return None
 
+    def get_action_integer(self, state_prime_int):
+        return self.sp_to_action_dict[state_prime_int]
+
     def get_next_action_from_policy(self, reply_str):
         """
 
