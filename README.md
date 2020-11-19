@@ -4,6 +4,11 @@ Disagreement can make conversation difficult. In today’s world, issues of impo
 # Approach
 First, we created a Facebook chat using Facebook API. Then, we took three reinforcement learning algorithms: Q-learning, Sarsa and Value Iteration, and applied them on synthetic data to train the chatbot. To sample the data, we designed an algorithm that uses Multinomial distribution.
 
+State: User response
+Actions: list of possible next questions to ask
+Reward: 100 if user agrees to take precautions, else -100
+Next state: User response to the question picked from Actions
+
 # Outcome
 We found that after training, Q-Learning and Sarsa underperformed Value Iteration algorithm. This occurred due to the small size of the data set. The small size leads to Q-Learning and Sarsa producing policies that have unrewarding cycles as learning doesn’t adequately cover the state space.
 
