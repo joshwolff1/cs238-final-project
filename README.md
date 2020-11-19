@@ -1,6 +1,11 @@
-# cs238-final-project
-
+# Introduction
 Disagreement can make conversation difficult. In today’s world, issues of importance often become incredibly polarizing. Given the pandemic, certain conversations –withanti-maskers, for example –areall the more necessary. Taking the proper precautions could prevent tens of thousandsof deaths innationwide.We seek to develop achatbot that learns to have these difficult conversations, actively learning the best policy to convince a COVID-19 skeptic to take proper safety precautions regarding the pandemic.
+
+# Approach
+To achieve this outcome, we took three reinforcement learning algorithms: Q-learning, sarsa and Value Iteration, and applied them on synthetic data. To sample the data, we designed an algorithm that uses Multinomial distribution.
+
+# Outcome
+We found that after training, Q-Learning and Sarsa underperformed Value Iteration algorithm. This occurred due to the small size of the data set. The small size leads to Q-Learning and Sarsa producing policies that have unrewarding cycles as learning doesn’t adequately cover the state space.
 
 ## Host server locally
 
