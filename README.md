@@ -2,7 +2,11 @@
 Disagreement can make conversation difficult. In today’s world, issues of importance often become incredibly polarizing. Given the pandemic, certain conversations –withanti-maskers, for example –areall the more necessary. Taking the proper precautions could prevent tens of thousandsof deaths innationwide. We seek to develop a chatbot that learns to have these difficult conversations, actively learning the best policy to convince a COVID-19 skeptic to take proper safety precautions regarding the pandemic.
 
 # Approach
-First, we created a Facebook chat using Facebook API. Then, we took three reinforcement learning algorithms: Q-learning, Sarsa and Value Iteration, and applied them on synthetic data to train the chatbot. To sample the data, we designed an algorithm that uses Multinomial distribution.
+First, we created a Facebook chat using Facebook API. Then, we took three reinforcement learning algorithms: Q-learning, Sarsa and Value Iteration, and applied them on synthetic data to train the chatbot. <br />
+To sample the data, we designed an algorithm that randomly assigned a multinomial distribution to the set of possible replies to a message we sent. <br />
+1) Sample from this distribution, given a state and an action
+2) The sampled reply from the user is the state prime <br />
+
 
 State: User response <br />
 Actions: list of possible next questions to ask <br />
