@@ -7,6 +7,10 @@ First, we created a Facebook chat using Facebook API. Then, we took three reinfo
 # Outcome
 We found that after training, Q-Learning and Sarsa underperformed Value Iteration algorithm. This occurred due to the small size of the data set. The small size leads to Q-Learning and Sarsa producing policies that have unrewarding cycles as learning doesn’t adequately cover the state space.
 
+# Video
+
+https://www.youtube.com/watch?v=W9qSnNPnw2M&ab_channel=MeileeZhou
+
 ## Host server locally
 
 1) `cd` into the repository directory
